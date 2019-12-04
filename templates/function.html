@@ -1,0 +1,253 @@
+
+function (ec,defaultTheme){
+        echarts = ec;
+        var option = {
+            0:{
+                backgroundColor: '#BCEE68',
+
+                title : {
+                    text: '性别'
+                },
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    data:['男','女']
+                },
+                toolbox: {
+                    show : true,
+                    feature : {
+                        dataView : {show: true, readOnly: false},
+                        restore : {show: true},
+                        saveAsImage : {show: true}
+                    }
+                },
+                calculable : true,
+                series : [
+                    {
+                        name:'性别',
+                        type:'pie',
+                        radius : '55%',
+                        center: ['50%', '60%'],
+                        data:[
+                            {value:56, name:'男'},
+                            {value:32, name:'女'},
+                        ]
+                    }
+                ]
+            },
+            1:{
+                backgroundColor: '#AEEEEE',
+                title : {
+                    text: '年龄',
+                },
+                tooltip : {
+                    trigger: 'axis'
+                },
+                toolbox: {
+                    show : true,
+                    feature : {
+                        dataView : {show: true, readOnly: false},
+                        magicType : {show: true, type: ['line', 'bar']},
+                        restore : {show: true},
+                        saveAsImage : {show: true}
+                    }
+                },
+                calculable : true,
+                xAxis : [
+                    {
+                        type : 'category',
+                        data : ['20-29','30-39','40-49','50-59','60-']
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series : [
+                    {
+                        name:'数量',
+                        type:'bar',
+                        data:[20, 25, 18, 19, 11],
+                        markPoint : {
+                            data : [
+                                {type : 'max', name: '最大值'},
+                                {type : 'min', name: '最小值'}
+                            ]
+                        }
+                    }
+                ]
+            },
+            2:{
+                backgroundColor: '#FFF68F',
+
+                title : {
+                    text: '类型',
+                },
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    data:['第一等','第二等']
+                },
+                toolbox: {
+                    show : true,
+                    feature : {
+                        dataView : {show: true, readOnly: false},
+                        restore : {show: true},
+                        saveAsImage : {show: true}
+                    }
+                },
+                calculable : true,
+                series : [
+                    {
+                        name:'类型',
+                        type:'pie',
+                        radius : '55%',
+                        center: ['50%', '60%'],
+                        data:[
+                            {value:56, name:'<span style="font-family: Arial, Helvetica, sans-serif;">第一等</span>'},
+                            {value:36, name:'第二等'},
+                        ]
+                    }
+                ]
+            },
+            3: {
+                backgroundColor: '#FFBBFF',
+                title : {
+                    text: '职业',
+                },
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    data:['<span style="font-family: Arial, Helvetica, sans-serif;">职业1</span><span style="font-family: Arial, Helvetica, sans-serif;">','职业2','职业2','职业3','职业4','其他'],</span>
+                    orient : 'vertical',
+                    x : 'right',
+                },
+                calculable : true,
+                series : [
+                    {
+                        name:'职业',
+                        type:'pie',
+                        radius : '55%',
+                        center: ['50%', '60%'],
+                        data:[
+                            {value:12, name:'职业1'},
+                            {value:32, name:'职业2'},
+                            {value:23, name:'职业3'},
+                            {value:12, name:'职业4'},
+                            {value:13, name:'其他'},
+                        ]
+                    }
+                ]
+            },
+            4:{
+                backgroundColor: '#CDCD00',
+                title : {
+                    text: '型号',
+                },
+                tooltip : {
+                    trigger: 'axis'
+                },
+                toolbox: {
+                    show : true,
+                    feature : {
+                        dataView : {show: true, readOnly: false},
+                        magicType : {show: true, type: ['line', 'bar']},
+                        restore : {show: true},
+                        saveAsImage : {show: true}
+                    }
+                },
+                calculable : true,
+                xAxis : [
+                    {
+                        type : 'category',
+                        data : ['A','C','D','R','F','O']
+                    }
+                ],
+                yAxis : [
+                    {
+                        type : 'value'
+                    }
+                ],
+                series : [
+                    {
+                        name:'数量',
+                        type:'bar',
+                        data:[19, 49, 18, 25, 14,43],
+                        markPoint : {
+                            data : [
+                                {type : 'max', name: '最大值'},
+                                {type : 'min', name: '最小值'}
+                            ]
+                        }
+                    }
+                ]
+            },
+            5:{
+                title : {
+                    text: '种类'
+                },
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    data:['H1','H2','H3','H4','H5','H6','H7'],
+                    orient : 'vertical',
+                    x : 'right',
+                },
+                calculable : true,
+                series : [
+                    {
+                        name:'种类',
+                        type:'pie',
+                        radius : ['50%', '70%'],
+                        itemStyle : {
+                            normal : {
+                                label : {
+                                    show : false
+                                },
+                                labelLine : {
+                                    show : false
+                                }
+                            },
+                            emphasis : {
+                                label : {
+                                    show : true,
+                                    position : 'center',
+                                    textStyle : {
+                                        fontSize : '13',
+                                        fontWeight : 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        data:[
+                            {value:17, name:'H1'},
+                            {value:23, name:'H2'},
+                            {value:14, name:'H3'},
+                            {value:8, name:'H4'},
+                            {value:18, name:'H5'},
+                            {value:10, name:'H6'},
+                            {value:10, name:'H7'},
+                        ]
+                    }
+                ]
+
+            }
+        };
+        for (var i = 0, l = domMain.length; i < l; i++) {
+            myChart[i] = echarts.init(domMain[i]);
+            myChart[i].setOption(option[i]);
+            require(['theme/infographic'], function(tarTheme){
+                myChart[i].setTheme(tarTheme);
+            })
+        }
+    }
+);

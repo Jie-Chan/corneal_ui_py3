@@ -1,0 +1,654 @@
+{% extends "base.html" %}
+
+{% block additionalButtonBlock %}
+    <button class="btn btn-success navbar-btn pull-right" type="button">
+        <span class="glyphicon glyphicon-refresh"></span>
+      <a href="/index/{{ checked_video_name }}">Refresh</a> {#   /#}
+    </button>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row text-center">
+            <h3>
+                <span class="glyphicon glyphicon-sunglasses"></span>
+                {{ checked_video_name }}
+            </h3>
+        </div>
+        <div class="row">
+            <button type="button" class="btn btn-panel" id="bioParamDetail">
+                <span class="glyphicon glyphicon-dashboard"></span>Biomechanical Parameters
+            </button>
+        </div>
+        <div class="row collapse bioParamCollapse" style="margin-bottom: 2em;">
+            <div class="col-md-6">
+                <table class="table table-hover table-bordered" style="font-size: 18px;">
+                    <tbody>
+                    {% for key, value in bio_params_1.items() %}
+                        <tr>
+                            <th>{{ key }}</th>
+                            <td>{{ value }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-hover table-bordered" style="font-size: 18px;">
+                    <tbody>
+                    {% for key, value in bio_params_2.items() %}
+                        <tr>
+                            <th>{{ key }}</th>
+                            <td>{{ value }}</td>
+                        </tr>
+                    {% endfor %}
+                    {# fill a blank row for beauty #}
+                    {#                    <tr style="height: 2.3em;">#}
+                    {#                        <th></th>#}
+                    {#                        <td></td>#}
+                    {#                    </tr>#}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <button type="button" class="btn btn-panel" id="chartDetail">
+                <span class="glyphicon glyphicon-stats"></span>Charts
+            </button>
+        </div>
+        <div class="row collapse chartCollapse" style="margin-bottom: 3em;">
+            <div class="col-md-11">
+                <div id="chart-line" style="width: 1000px; height:400px; margin-top: 1em;"></div>
+                <script type="text/javascript" src="{{ url_for('static', filename='js/echarts.min.js') }}"></script>
+                <script type="text/javascript">
+                    // 基于准备好的dom，初始化echarts实例
+                    var myChart = echarts.init(document.getElementById('chart-line'));
+
+                    function gen_xs_from_1(n) {
+                        // create a array, from 1 to n, including n
+
+                        var arr = Array(n);
+                        for (var ii = 0; ii < n; ii++) {
+                            arr[ii] = String(ii + 1);
+                        }
+                        return arr;
+                    }
+
+                    // 指定图表的配置项和数据
+                    var option = {
+                        backgroundColor: '#010c2c',
+                        title: {
+                            text: "中央角膜区域",
+                            left: '40.6%',
+                            top: '0.7%',
+                            textStyle: {
+                                color: '#f2f2f2'
+                            }
+                        },
+                        legend: {
+                            data: ['厚度', '厚度-平滑', '曲率', '曲率-平滑'],
+                            left: '32%',
+                            top: '11%',
+                            textStyle: {
+                                color: '#878787'
+                            }
+                        },
+                        tooltip: {
+                            trigger: 'axis'
+                        },
+                        toolbox: {
+                            show: true,
+                            feature: {
+                                dataZoom: {
+                                    yAxisIndex: 'none'
+                                },
+                                dataView: {readOnly: false},
+                                magicType: {type: ['line', 'bar']},
+                                restore: {},
+                                saveAsImage: {}
+                            }
+                        },
+                        grid: {
+                            left: '4%',
+                            right: '7%',
+                            top: '22%',
+                            bottom: '7%',
+                            containLabel: true
+                        },
+                        xAxis: {
+                            type: 'category',
+                            boundaryGap: false,
+                            splitLine: {
+                                show: false
+                            },
+                            axisLine: {
+                                lineStyle: {
+                                    color: '#5c5d89'
+                                }
+                            },
+                            axisTick: {
+                                "show": false
+                            },
+                            axisLabel: {
+                                textStyle: {
+                                    color: '#5c5d89'
+                                }
+                            },
+                            data: gen_xs_from_1({{ video_length }})
+                        },
+                        yAxis:
+                            [
+                                {
+                                    type: 'value',
+                                    axisLine: {
+                                        show: false,
+                                        lineStyle: {
+                                            color: '#5c5d89'
+                                        }
+                                    },
+                                    axisTick: {
+                                        show: false
+                                    },
+                                    splitLine: {
+                                        show: false
+                                    },
+                                    axisLabel: {
+                                        textStyle: {
+                                            color: '#5c5d89'
+                                        }
+                                    },
+                                    name: '厚度：毫米(mm)',
+                                    min: {{ min_thick }} - 0.012,
+                                    max: {{ max_thick }} + 0.025,
+                                    position: 'left'
+                                },
+                                {
+                                    type: 'value',
+                                    axisLine: {
+                                        show: false,
+                                        lineStyle: {
+                                            color: '#5c5d89'
+                                        }
+                                    },
+                                    axisTick: {
+                                        show: false
+                                    },
+                                    splitLine: {
+                                        show: false
+                                    },
+                                    axisLabel: {
+                                        textStyle: {
+                                            color: '#5c5d89'
+                                        }
+                                    },
+                                    name: '曲率',
+                                    position: 'right',
+                                    axisLabel: {
+                                        formatter: '{value}'
+                                    }
+                                },
+                            ],
+
+                        series: [
+                            {
+                                name: '厚度',
+                                type: 'line',
+                                itemStyle: {
+                                    normal: {
+                                        color: '#a173ed',
+                                    },
+                                },
+                                data: {{ thick_data }},
+                            },
+                            {
+                                name: '厚度-平滑',
+                                type: 'line',
+                                itemStyle: {
+                                    normal: {
+                                        color: '#e6ed82',
+                                    },
+                                },
+                                data: {{ thick_data_smoothed }},
+                                markPoint: {
+                                    data: [
+                                        {
+                                            type: 'min', name: '最小值',
+                                            itemStyle: {
+                                                normal: {
+                                                    color: '#bc89ab',
+                                                },
+                                            },
+                                        }
+                                    ]
+                                },
+                            },
+                            {
+                                name: '曲率',
+                                type: 'line',
+                                yAxisIndex: 1,
+                                itemStyle: {
+                                    normal: {
+                                        color: '#02b5d5',
+                                    },
+                                },
+                                data: {{ curvatures }},
+                            },
+                            {
+                                name: '曲率-平滑',
+                                type: 'line',
+                                yAxisIndex: 1,
+                                itemStyle: {
+                                    normal: {
+                                        color: '#e7fff6',
+                                    },
+                                },
+                                data: {{ curvatures_smoothed }},
+                                markPoint: {
+                                    data: [
+                                        {
+                                            type: 'max', name: '最大值',
+                                            itemStyle: {
+                                                normal: {
+                                                    color: '#01bc8f',
+                                                },
+                                            },
+                                        }
+                                    ]
+                                },
+                                markLine: {
+                                    data: [
+                                        {yAxis: 0, name: '压平'}
+                                    ]
+                                }
+                            }
+                        ]
+                    };
+
+                    // 使用刚指定的配置项和数据显示图表。
+                    myChart.setOption(option);
+                </script>
+            </div>
+            <div class="col-md-11">
+                <div id="chart-scatter3d" style="width: 1000px; height:600px; margin-top: 2em;"></div>
+                <script src="{{ url_for('static', filename='js/echarts.min.js') }}"></script>
+                <script src="{{ url_for('static', filename='js/echarts-gl.min.js') }}"></script>
+                <script type="text/javascript">
+                    // 基于准备好的dom，初始化echarts实例
+                    var myBar = echarts.init(document.getElementById('chart-scatter3d'));
+
+                    // 指定图表的配置项和数据
+                    myBar.setOption({
+                        title: {
+                            text: "角膜上表面",
+                            left: '40.6%',
+                            top: '0.7%',
+                            textStyle: {
+                                color: '#f2f2f2'
+                            }
+                        },
+                        toolbox: {
+                            show: true,
+                            feature: {
+                                dataView: {readOnly: false},
+                                restore: {},
+                                saveAsImage: {}
+                            }
+                        },
+                        backgroundColor: '#010c2c',
+                        visualMap: {
+                            show: false,
+                            min: {{ min_height }},
+                            max: {{ max_height }},
+                            inRange: {
+                                color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+                            }
+                        },
+                        xAxis3D: {
+                            type: 'value',
+                            name: 'index',
+                            axisPointer: {
+                                label: {
+                                    formatter: function (value) {
+                                        return parseFloat(value).toFixed(0);
+                                    },
+                                    textStyle: {
+                                        color: '#bcfcf5',
+                                        fontWeight: 'bold',
+                                        fontFamily: 'Arial',
+                                        fontSize: '19'
+                                    }
+                                }
+                            }
+                        },
+                        yAxis3D: {
+                            type: 'value',
+                            name: 'width',
+                            axisPointer: {
+                                label: {
+                                    formatter: function (value) {
+                                        return parseFloat(value).toFixed(0);
+                                    },
+                                    textStyle: {
+                                        color: '#bcfcf5',
+                                        fontWeight: 'bold',
+                                        fontFamily: 'Arial',
+                                        fontSize: '19'
+                                    }
+                                }
+                            },
+                        },
+                        zAxis3D: {
+                            type: 'value',
+                            name: 'height',
+                            min: {{ min_height }} -5,
+                            max: {{ max_height }} +5,
+                            axisLabel: {
+                                formatter: function (value) {
+                                    return -value.toFixed(1);
+                                }
+                            },
+                            axisTick: {
+                                show: false
+                            },
+                            axisPointer: {
+                                label: {
+                                    formatter: function (value) {
+                                        return -parseFloat(value).toFixed(2);
+                                    },
+                                    textStyle: {
+                                        color: '#bcfcf5',
+                                        fontWeight: 'bold',
+                                        fontFamily: 'Arial',
+                                        fontSize: '19'
+                                    }
+                                }
+                            },
+
+                        },
+                        grid3D: {
+                            boxDepth: 150,
+                            boxHeight: 90,
+                            boxWidth: 90,
+                            axisLine: {
+                                lineStyle: {color: '#fff'}
+                            },
+                            axisPointer: {
+                                lineStyle: {color: '#fff'},
+
+                            },
+                            viewControl: {
+                                // autoRotate: true
+                            },
+                            light: {
+                                main: {
+                                    shadow: true,
+                                    quality: 'ultra',
+                                    intensity: 1.5
+                                }
+                            },
+                            top: '5%'
+                        },
+                        series: [{
+                            type: 'scatter3D',
+                            data: {{ curve3d_up }},
+                            shading: 'lambert',
+                            label: {
+                                formatter: function (param) {
+                                    return 'i  \t:\t\t' + param.value[0].toFixed(0) +
+                                        '\n\nw\t:\t\t' + param.value[1].toFixed(0) +
+                                        '\n\nh \t:\t\t' + -param.value[2].toFixed(2);
+                                }
+
+                            }
+                        }]
+                    });
+                    window.onresize = myBar.resize;
+
+                </script>
+            </div>
+            <div class="col-md-11">
+                <div id="chart" style="width: 1000px; height:400px; margin-top: 3em;"></div>
+                <script type="text/javascript" src="{{ url_for('static', filename='js/echarts.min.js') }}"></script>
+                <script type="text/javascript">
+                    // 基于准备好的dom，初始化echarts实例
+                    var myChart1 = echarts.init(document.getElementById('chart'));
+
+                    function gen_xs_from_1(n) {
+                        // create a array, from 1 to n, including n
+
+                        var arr = Array(n);
+                        for (var ii = 0; ii < n; ii++) {
+                            arr[ii] = String(ii + 1);
+                        }
+                        return arr;
+                    }
+
+                    // 指定图表的配置项和数据
+                    var option1 = {
+                        backgroundColor: '#010c2c',
+                        title: {
+                            text: "追踪角膜动态形变",
+                            left: '40.6%',
+                            top: '0.7%',
+                            textStyle: {
+                                color: '#f2f2f2'
+                            }
+                        },
+                        legend: {
+                            data: ['峰值弧长', '顶点位移'],
+                            left: '32%',
+                            top: '11%',
+                            textStyle: {
+                                color: '#878787'
+                            }
+                        },
+                        tooltip: {
+                            trigger: 'axis'
+                        },
+                        toolbox: {
+                            show: true,
+                            feature: {
+                                dataZoom: {
+                                    yAxisIndex: 'none'
+                                },
+                                dataView: {readOnly: false},
+                                magicType: {type: ['line', 'bar']},
+                                restore: {},
+                                saveAsImage: {}
+                            }
+                        },
+                        grid: {
+                            left: '4%',
+                            right: '7%',
+                            top: '22%',
+                            bottom: '7%',
+                            containLabel: true
+                        },
+                        xAxis: {
+                            type: 'category',
+                            boundaryGap: false,
+                            splitLine: {
+                                show: false
+                            },
+                            axisLine: {
+                                lineStyle: {
+                                    color: '#5c5d89'
+                                }
+                            },
+                            axisTick: {
+                                "show": false
+                            },
+                            axisLabel: {
+                                textStyle: {
+                                    color: '#5c5d89'
+                                }
+                            },
+                            data: gen_xs_from_1({{ video_length }})
+                        },
+                        yAxis:
+                            [
+                                {
+                                    type: 'value',
+                                    axisLine: {
+                                        show: false,
+                                        lineStyle: {
+                                            color: '#5c5d89'
+                                        }
+                                    },
+                                    axisTick: {
+                                        show: false
+                                    },
+                                    splitLine: {
+                                        show: false
+                                    },
+                                    axisLabel: {
+                                        textStyle: {
+                                            color: '#5c5d89'
+                                        }
+                                    },
+                                    name: '弧长：毫米(mm)',
+                                    min: {{ min_darc }} - 0.012,
+                                    max: {{ max_darc }} + 0.025,
+                                    position: 'left'
+                                },
+                                {
+                                    type: 'value',
+                                    axisLine: {
+                                        show: false,
+                                        lineStyle: {
+                                            color: '#5c5d89'
+                                        }
+                                    },
+                                    axisTick: {
+                                        show: false
+                                    },
+                                    splitLine: {
+                                        show: false
+                                    },
+                                    axisLabel: {
+                                        textStyle: {
+                                            color: '#5c5d89'
+                                        }
+                                    },
+                                    name: '顶点位移',
+                                    min: {{ min_apex }} - 0.012,
+                                    max: {{ max_apex }} + 0.025,
+                                    position: 'right'
+
+                                },
+                            ],
+
+                        series: [
+                            {
+                                name: '峰值弧长',
+                                type: 'line',
+                                itemStyle: {
+                                    normal: {
+                                        color: '#a173ed',
+                                    },
+                                },
+                                data: {{ d_arc }},
+                            },
+                            {
+                                name: '峰值弧长-平滑',
+                                type: 'line',
+                                itemStyle: {
+                                    normal: {
+                                        color: '#e6ed82',
+                                    },
+                                },
+                                data: {{ d_arc_smoothed }},
+                                markPoint: {
+                                    data: [
+                                        {
+                                            type: 'min', name: '最小值',
+                                            itemStyle: {
+                                                normal: {
+                                                    color: '#bc89ab',
+                                                },
+                                            },
+                                        }
+                                    ]
+                                },
+                            },
+                            {
+                                name: '顶点位移',
+                                type: 'line',
+                                yAxisIndex: 1,
+                                itemStyle: {
+                                    normal: {
+                                        color: '#02b5d5',
+                                    },
+                                },
+                                data: {{ apex }},
+                            },
+                            {
+                                name: '顶点位移-平滑',
+                                type: 'line',
+                                yAxisIndex: 1,
+                                itemStyle: {
+                                    normal: {
+                                        color: '#e7fff6',
+                                    },
+                                },
+                                data: {{ apex_smoothed }},
+                                markPoint: {
+                                    data: [
+                                        {
+                                            type: 'max', name: '最大值',
+                                            itemStyle: {
+                                                normal: {
+                                                    color: '#01bc8f',
+                                                },
+                                            },
+                                        }
+                                    ]
+                                },
+
+                            }
+                        ]
+                    };
+
+                    // 使用刚指定的配置项和数据显示图表。
+                    myChart1.setOption(option1);
+                </script>
+            </div>
+        </div>
+        <div class="row">
+            <button type="button" class="btn btn-panel" id="videoDetail">
+                <span class="glyphicon glyphicon-facetime-video"></span>Videos
+            </button>
+        </div>
+        <div class="row collapse videoCollapse" style="margin-bottom: 2em;">
+            <div class="col-md-6">
+                <video controls>
+                    <source src="{{ root }}/static/cache/infer/original_{{ checked_video_name }}.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="col-md-6">
+                <video controls>
+                    <source src="{{ root }}/static/cache/infer/blend_{{ checked_video_name }}.mp4" type="video/mp4">
+                </video>
+            </div>
+        </div>
+        <div class="row">
+            <button type="button" class="btn btn-panel" id="frameDetail">
+                <span class="glyphicon glyphicon-zoom-in"></span>Frames
+            </button>
+        </div>
+        <div class="row collapse frameCollapse">
+            <div class="col-md-6">
+                {% for p in checked_frame_path %}
+                    <img src="{{ url_for('static', filename=p) }}"/>
+                    <div class="caption">{{ loop.index }}</div>
+                {% endfor %}
+            </div>
+            <div class="col-md-6">
+                {% for p in checked_infer_path %}
+                    <img src="{{ url_for('static', filename=p) }}"/>
+                    <div class="caption">{{ loop.index }}</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
